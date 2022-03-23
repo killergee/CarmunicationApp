@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -31,12 +33,48 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_SPEECH_INPUT = 1;
     public String userMessage = "";
 
+    public boolean checkForDisablingHandsFree(String userMessage){
+        boolean stopHandFree = false;
+        String[] allWords = userMessage.split(" ");
+        String stopSentence = " stop hands free";
+        String stopSentenceV2 = " stop hands-free";
+        String sentenceFormedSoFar = "";
+
+        for ( String currentWord : allWords) {
+            Log. d("See", "Speak  " + currentWord);
+            if (currentWord.equals("stop")  || currentWord.equals("hands") || currentWord.equals("free")
+                    || currentWord.equals("hands-free")  ){
+                sentenceFormedSoFar = sentenceFormedSoFar + " " + currentWord;
+            }
+            if (stopSentence.equals(sentenceFormedSoFar) || stopSentenceV2.equals(sentenceFormedSoFar)){
+                stopHandFree = true;
+                Log. d("Seee", "works");
+                break;
+            }
+        }
+        Log. d("SeeMessages", "Speak to text:" + sentenceFormedSoFar + ":");
+
+        return stopHandFree;
+    }
+
     public void displayUserWords(Intent data){
         userInputHolder = findViewById(R.id.messageHistory);
-        ArrayList<String> result2 = data.getStringArrayListExtra(
-                RecognizerIntent.EXTRA_RESULTS);
+        ArrayList<String> result2 = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
         userInputHolder.setText(Objects.requireNonNull(result2).get(0));
-        //userMessage = result2[0];
+        userMessage = TextUtils.join(", ", result2);
+        Log. d("SeeMessage", "Testtttttttttttttt " + result2);
+
+
+        // Repeat process till stopped:
+
+        if(checkForDisablingHandsFree(userMessage) == false) {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
+
+            someActivityResultLauncher.launch(intent);
+        }
 
     }
 
