@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
 
+
             someActivityResultLauncher.launch(intent);
         }
 
@@ -80,18 +81,24 @@ public class MainActivity extends AppCompatActivity {
 
     // You can do the assignment inside onAttach or onCreate, i.e, before the activity is displayed
     ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        // There are no request codes
-                        Intent data = result.getData();
-                        Log. d("Tagged", "Tester hesssss");
-                        displayUserWords(data);
-                    }
-                }
-            });
+    new ActivityResultContracts.StartActivityForResult(),
+    new ActivityResultCallback<ActivityResult>() {
+
+
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            Log. d("Ta", "hhhhhhhhhhhhhh" + result);
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                // There are no request codes
+                Intent data = result.getData();
+                Log. d("Tagged", "Tester hesssss");
+                displayUserWords(data);
+                //: hhhhhhhhhhhhhhActivityResult{resultCode=RESULT_CANCELED, data=null}
+            }
+        }
+
+    });
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,35 +117,12 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
                 intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
 
+
                 someActivityResultLauncher.launch(intent);
 
-                Log. d("myTag", "Tester Tester");
-
-                /*try {
-                    startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
-                    ActivityResultContract(intent, REQUEST_CODE_SPEECH_INPUT);
-                }
-                catch (Exception e) {
-                    Toast.makeText(MainActivity.this, " " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }*/
             }
         });
 
-
-
-        /*// voice listener activation
-
-        SpeechRecognition speechRecognition = new SpeechRecognition(this);
-        speechRecognition.setSpeechRecognitionPermissionListener(this);
-        speechRecognition.setSpeechRecognitionListener(this);
-
-        Button speakButton = findViewById(R.id.button);
-        speakButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                speechRecognition.startSpeechRecognition();
-            }
-        });*/
 
 
 
@@ -188,25 +172,5 @@ public class MainActivity extends AppCompatActivity {
                 System.exit(0);
             }
         });
-
-
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode,
-                                    @Nullable Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
-            if (resultCode == RESULT_OK && data != null) {
-                ArrayList<String> result = data.getStringArrayListExtra(
-                        RecognizerIntent.EXTRA_RESULTS);
-                TextView tv = new TextView(this);
-                tv.setText(Objects.requireNonNull(result).get(0));
-                displayInputText.addView(tv);
-
-            }
-        }
-    }
-
 }
